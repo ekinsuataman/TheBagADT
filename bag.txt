@@ -1,0 +1,291 @@
+package bag_implementation;
+
+public class Bag<AnyType extends Comparable<AnyType>> {
+    
+private Node<AnyType> root;
+private int sizeOfBag;
+private int distictSize;
+
+public Bag()
+{
+    root=null;
+    sizeOfBag=0;
+    distictSize=0;
+}
+
+// Inserts data as a binary search tree and accounts distictSize and sizeOfBag.
+public void add (AnyType item){     
+
+    sizeOfBag++;
+    if(root==null)
+    {
+        root=new Node(item);
+        distictSize++;
+        return;
+    }
+    Node<AnyType> current=root;
+    Node<AnyType> parent;
+    while(true)
+    {   
+        parent =current;
+        if(current.getData().compareTo(item)>0)
+        {
+            current=current.getLeftChild();
+            if(current==null)
+            {
+                parent.setLeftChild(new Node(item));
+                distictSize++;
+                return;
+            }            
+        }
+        else if (current.getData().compareTo(item)<0)
+            {
+                 current=current.getRightChild();
+                if(current==null)
+                {
+                    parent.setRightChild(new Node(item)) ;
+                    distictSize++;
+                    return;
+                }
+            }
+        else
+        {
+            current.changeItemCounter(1);
+            return;
+        }
+    }
+    
+}
+
+/*
+*  Deletes all nodes in tree by calling clearTree method. Changes sizeOfBag 
+* and distictSize values to 0 because deleteNode method directly deletes given 
+* node and ignores item  numbers.
+*/
+public void clear ( ){
+    sizeOfBag=0;
+    distictSize=0;
+   clearTree(root);
+}
+
+/* 
+*  Starts deleting proccess from leaves and than deletes
+* parents. A preorder recursive structure is used.
+*/
+private void clearTree(Node<AnyType> node){  
+    if(node!=null)
+    {
+     clearTree(node.getLeftChild());
+     clearTree(node.getRightChild());
+     deleteNode(node);
+    }
+}
+
+/*
+* Checks whether given item is present in tree or not by calling findElement
+* method. findElement method returns the node if item is present in tree, if not  
+* returns null.
+*/
+public boolean contains (AnyType item){
+    
+    return findElement(item)!=null;
+}
+
+//Returns distictSize directly.
+public int distictSize ( ){
+    return distictSize;
+}
+
+
+@Override
+public boolean equals(Object obj){
+    if(obj==this)              //Checks whether given object and this object is  same or not.
+        return true;
+    
+    if(obj instanceof Bag)           // Checks given object is a bag or not
+    {
+    Bag<AnyType> bag=(Bag)obj;
+    if(this.getClass()==bag.getClass())   //Checks the data types of bags are same or not
+    {
+        if(sizeOfBag==bag.size() && distictSize==bag.distictSize())  // Compares sizes of bags and distict size to shorten execution time
+        {
+          String text1=this.toString();        
+          String text2=bag.toString();
+          return text1.equals(text2);     //Checks item by item
+        }else
+            return false;
+    }else        
+         return false;               //returns false if data types of bags are different
+    }else
+         return false;            //returns false if given object is not a bag
+   
+}
+
+/* Finds node in the tree if there is such a node ,and returns its item counter value
+*  which stores size of element.If there is not such a element in tree,returns 0.
+*/
+public int elementSize (AnyType item){
+    Node<AnyType> node=findElement(item);   
+    if(null==node)
+        return 0;
+    else
+        return node.getItemCounter();
+}
+
+// Checks the collection is empty or not
+public boolean isEmpty( ){
+    return root==null;
+}
+
+public boolean remove(AnyType item)
+{
+    Node<AnyType> node = findElement(item);
+    if(node==null)
+    {
+        return false;
+    }
+    else
+    {
+        sizeOfBag --;
+        if(node.getItemCounter()>1)
+            node.changeItemCounter(-1); 
+        else
+        {   
+            distictSize--;
+            deleteNode(node);
+        }
+        return true;
+    }
+
+}
+
+public int size ( ){
+    return sizeOfBag;
+}
+
+
+@Override
+public String toString()
+{
+    if(root!=null)
+        return "{"+getString(root)+"}";
+    else
+        return "There isn't any element in the bag!!!"; 
+}
+
+
+private String getString(Node<AnyType> node){
+    String text="";
+    if(node!=null)
+    {
+    text+=getString(node.getLeftChild());
+    for(int i=0;i<node.getItemCounter();i++)
+    { text += "" + node.getData() + ","; }
+    text+=getString(node.getRightChild());
+    }
+    return text;
+}
+
+
+private Node findElement(AnyType data){
+    Node<AnyType> node=root;
+    
+   while(node!=null)
+   {
+    if(node.getData().compareTo(data)<0)
+    {
+        node=node.getRightChild();
+    }
+    else if(node.getData().compareTo(data)>0)
+    {
+        node=node.getLeftChild();
+    }else
+        return node;
+   }
+   
+   return node;
+}
+
+
+
+private void deleteNode(Node<AnyType> node)
+{
+   if(node.getRightChild()==null && node.getLeftChild()==null)    // If node has no child
+   {
+       if(node==root)
+           root=null;
+    else 
+       {
+       Node<AnyType> parent=getParent(node);              // Gets parent of the node that wanted to be deleted
+       if(parent.getRightChild()==node)
+          parent.setRightChild(null);
+       else
+          parent.setLeftChild(null);
+       }
+   }else if(node.getRightChild()==null)    //if node has one child
+   {
+       if(node==root)
+           root=root.getLeftChild();
+       else
+       {
+           Node<AnyType> parent=getParent(node);         // Gets parent of the node that wanted to be deleted
+           if(parent.getRightChild()==node)              // Changes parent's pointers 
+             parent.setRightChild(node.getLeftChild());
+           else
+             parent.setLeftChild(node.getLeftChild());
+       }
+   }else if(node.getLeftChild()==null)  
+   {
+       if(node==root)
+           root=root.getRightChild();
+       else
+       {   Node<AnyType> parent=getParent(node);
+           if(parent.getRightChild()==node)
+             parent.setRightChild(node.getRightChild());
+           else
+             parent.setLeftChild(node.getRightChild());
+       }
+   }else if(node.getLeftChild()!=null && node.getRightChild()!=null) //If node has two child
+   {
+       
+    Node<AnyType> succesor=node.getLeftChild();      // Finds a proper node(succesor) to replace with the node that wanted to be deleted(node). 
+    while(succesor.getRightChild()!=null)
+    {
+        succesor=succesor.getRightChild();
+    }
+    AnyType temp_data= (AnyType) succesor.getData();   //Stores the data of succesor node that will swap with the node that wanted to be deleted.
+    int temp_item_counter=succesor.getItemCounter();
+    deleteNode(succesor);                             //Deletes the succesor 
+    node.setData(temp_data);                         // Changes the data of node that wanted to be deleted with stored data
+    node.setItemCounter(temp_item_counter);          // By this way, we complete the process of the deletion of the node
+    
+    }
+}
+
+// Returns parent of given node.
+private Node<AnyType> getParent(Node<AnyType> node)
+{
+     
+   Node<AnyType> parent=root;
+   while(true)
+   {
+       if(node.getData().compareTo(parent.getData()) > 0)
+       {
+           if(parent.getRightChild()== node)
+               break;
+           else
+               parent=parent.getRightChild();
+       }else if(node.getData().compareTo(parent.getData()) < 0)
+       {
+           if(parent.getLeftChild()== node)
+               break;
+           else
+               parent=parent.getLeftChild();
+       }
+          
+   } 
+   return parent;
+}
+
+}
+

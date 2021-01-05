@@ -1,0 +1,54 @@
+package bag_implementation;
+
+public class  Node<AnyType extends Comparable<AnyType>>{
+   
+    private AnyType data;
+    private int item_counter;
+    private Node<AnyType> left_child;
+    private Node<AnyType> right_child;
+    
+    public Node(AnyType input)
+    {
+        this.data=input;
+        item_counter=1;
+        left_child=null;
+        right_child=null;
+    }
+    
+    public AnyType getData()
+    {
+        return data;
+    }
+    public void setData(AnyType data)
+    {
+         this.data=data;
+    }
+    public int getItemCounter()
+    {
+        return item_counter;
+    }
+    
+    public Node<AnyType> getLeftChild(){
+        return left_child;
+    }
+    public Node<AnyType> getRightChild(){
+        return right_child;
+    }
+    public void setLeftChild(Node<AnyType> node)
+   {
+       left_child=node;
+   }
+   public void setRightChild(Node<AnyType> node)
+   {
+       right_child=node;
+   }
+   public void setItemCounter(int num)
+    {
+        item_counter=num;
+    }
+    public void changeItemCounter(int num)
+    {
+        item_counter+=num;
+    }
+    
+}
